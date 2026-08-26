@@ -55,11 +55,19 @@ services:
     security_opt: [no-new-privileges:true]
 
   kypost-server:
-    # Built from the main branch, per PROMPT.md section 3. Swap for
-    # `context: ../kypost-server` to test against a local checkout.
-    build:
-      context: https://github.com/Yoshiofthewire/KyPost-Server.git#main
-    image: kypost-server:demo
+    # The published image, not a build. Before 2026-08-25 there was no published
+    # image and this had to build from source; there is one now, and pulling it
+    # is what the install docs tell everyone else to do — so the demo runs the
+    # same artifact, by digest, that a self-hoster gets.
+    #
+    # It also makes `docker compose pull` work here at all. With a local-only
+    # `kypost-server:demo` tag, pull failed with "repository does not exist",
+    # and the only way to move the demo forward was a rebuild.
+    #
+    # To test against a local checkout, comment the image line and use:
+    #   build:
+    #     context: ../kypost-server
+    image: ghcr.io/busness-app/kypost-server:${KYPOST_VERSION:-stable}
     container_name: kypost-server
     restart: unless-stopped
     depends_on:

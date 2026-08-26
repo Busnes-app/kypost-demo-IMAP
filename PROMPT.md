@@ -18,7 +18,7 @@ The objective is to build a single, lightweight, self-contained mock IMAP and SM
 ## 3. Technical Stack Selection
 Implement this server using the following blueprint:
 
- **Blueprint A (Node.js)**: Built using the `smtp-server` and `imap-server` npm packages inside a single clean executable. Build KyPost-Server from the `main` branch of [its repository](https://github.com/Yoshiofthewire/KyPost-Server), and use its runtime and dependency versions.
+ **Blueprint A (Node.js)**: Built using the `smtp-server` and `imap-server` npm packages inside a single clean executable. Build KyPost-Server from the `main` branch of [its repository](https://github.com/Busness-app/KyPost-Server), and use its runtime and dependency versions.
 
 
 ## 4. Feature Requirements

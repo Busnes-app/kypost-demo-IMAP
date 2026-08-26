@@ -1,0 +1,41 @@
+name: Demo harness bug
+description: The demo mail sandbox itself is broken — not KyPost running on top of it.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        **Read this first, it saves you a round trip.** This repository is the
+        disposable IMAP/SMTP/CardDAV sandbox the public demo runs against. If you
+        hit something at demo.kypost.org that is about *mail behaviour* — a
+        message not labelled, pairing failing, PGP, the web UI — that is
+        **KyPost-Server**, not here.
+
+
+        File here when the sandbox is at fault: it will not start, the seeded
+        corpus is wrong or missing, TLS between the sandbox and the server fails,
+        or the demo persona's mailbox is in a bad state.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what you expected instead
+    validations: {required: true}
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where did you see it?
+      options:
+        - "The public demo at demo.kypost.org"
+        - "Running this harness myself"
+    validations: {required: true}
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations: {required: true}
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: "`docker compose logs kypost-demo-mail`. Redact before pasting."
+      render: text

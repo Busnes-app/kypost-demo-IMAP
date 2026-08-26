@@ -5,6 +5,12 @@ body:
   - type: markdown
     attributes:
       value: >-
+        **Never report a security vulnerability here.** Use
+        [Security Advisories](https://github.com/Busness-app/kypost-demo-IMAP/security/advisories/new)
+        — this harness holds a tunnel token and a reset token, and a public issue
+        discloses a live weakness before a fix exists.
+
+
         **Read this first, it saves you a round trip.** This repository is the
         disposable IMAP/SMTP/CardDAV sandbox the public demo runs against. If you
         hit something at demo.kypost.org that is about *mail behaviour* — a

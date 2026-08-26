@@ -8,4 +8,4 @@ contact_links:
     about: >-
       Most things you hit at demo.kypost.org are the SERVER, not this harness.
       Mail, labelling, pairing, PGP and the web UI all live in KyPost-Server.
-      This repo is only the throwaway IMAP/SMTP sandbox the demo runs against.
+      This repo is only the throwaway IMAP/SMTP/CardDAV sandbox behind it.

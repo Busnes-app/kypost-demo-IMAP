@@ -33,9 +33,27 @@ body:
     attributes:
       label: Steps to reproduce
     validations: {required: true}
+
+  - type: input
+    id: build
+    attributes:
+      label: Which build was running?
+      description: >-
+        `KYPOST_VERSION` from your `.env`, and the commit of this repository.
+        docker-compose.yml pins the server by a floating `${KYPOST_VERSION:-stable}`
+        tag, so "stable" means different things on different days — a "would not
+        start" or "corpus is wrong" report is not reproducible without it. For the
+        public demo, say so and the maintainer will fill it in.
+      placeholder: "KYPOST_VERSION=0.3.0, harness commit 57b95a8"
   - type: textarea
     id: logs
     attributes:
       label: Relevant output
-      description: "`docker compose logs kypost-demo-mail`. Redact before pasting."
+      description: >-
+        Name the service — `docker compose logs kypost-demo-mail`. Plain
+        `docker compose logs` includes the `cloudflared` container, whose
+        environment carries `CLOUDFLARED_TUNNEL_TOKEN`; `.env` also holds
+        `RESET_TOKEN` and `DEMO_PASSWORD`. Those are named here because "redact
+        before pasting" only works on things you recognise, and a tunnel token
+        in a log line does not look like a secret.
       render: text

@@ -45,13 +45,37 @@ test('injected mail is unseen', () => {
   assert.ok(!msg.flags.has('\\Seen'), 'new mail must be unread or it fires no notification');
 });
 
-test('a repeated trigger recipient delivers once', () => {
+test('a repeated trigger recipient delivers once', async () => {
   const p = store.forUser('rcpt-dedup');
   const before = p.folders.get('INBOX').messages.length;
   const rcpts = Array(20).fill('deliver-mail@kypost-demo.local');
   rcpts.push('Deliver-Mail@elsewhere.test');
-  assert.equal(deliverForRecipients(p, rcpts, corpus, () => {}), 1);
+  assert.equal(await deliverForRecipients(p, rcpts, corpus, () => {}), 1);
   assert.equal(p.folders.get('INBOX').messages.length, before + 1);
+});
+
+test('crypto-good encrypts to the submitting user Autocrypt key', async () => {
+  const { generateKey, readKey, readMessage, readPrivateKey, decrypt } = await import('openpgp');
+  const { privateKey, publicKey } = await generateKey({
+    type: 'ecc', curve: 'curve25519', userIDs: [{ email: 'crypto-user@example.test' }],
+  });
+  const key = await readKey({ armoredKey: publicKey });
+  const binary = await key.write();
+  const raw = `From: <crypto-user@example.test>\r\nAutocrypt: addr=crypto-user@example.test; keydata=${Buffer.from(binary).toString('base64')}\r\n\r\ntrigger`;
+  const p = store.forUser('crypto-reply-test');
+  const before = p.folders.get('INBOX').messages.length;
+
+  assert.equal(await deliverForRecipients(p, ['deliver-crypto-good@test'], corpus, () => {}, {
+    from: 'crypto-user@example.test', raw,
+  }), 1);
+
+  const delivered = p.folders.get('INBOX').messages.slice(before)[0].raw;
+  const armor = delivered.slice(delivered.indexOf('-----BEGIN PGP MESSAGE-----'));
+  const result = await decrypt({
+    message: await readMessage({ armoredMessage: armor }),
+    decryptionKeys: await readPrivateKey({ armoredKey: privateKey }),
+  });
+  assert.match(result.data, /encrypted to your OpenPGP public key/);
 });
 
 test('the trigger table covers every category plus batch', () => {

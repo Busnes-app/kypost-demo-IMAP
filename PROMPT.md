@@ -10,7 +10,11 @@ The objective is to build a single, lightweight, self-contained mock IMAP and SM
 * **Cloudflared Deployment**: Ship `cloudflared`, KyPost Server, and the demo mail server together in one `docker-compose.yml`, all attached to the same `KyPost-Net` with matching static network settings. `cloudflared` must route to KyPost Server only; it must never connect directly to the demo mail server. No IMAP, SMTP, or CardDAV port may be directly published to the public internet or host interface.
 * **IP-Only Trust Boundary**: The demo mail server must allow connections only from KyPost Server at `172.30.0.10` and reject all other source IPs, including direct connections from `cloudflared`. Enforce this allowlist at the Docker/network layer and in the application.
 * **Universal Authentication**: The IMAP server must accept any alphanumeric username and password combination to guarantee frictionless testing for automated bots and app store human reviewers.
-* **Zero Real Cryptography Overhead**: The server does not need to perform live PGP encryption or decryption. It only hosts pre-configured, hardcoded, raw text strings that simulate encrypted payloads.
+* **Minimal Real Cryptography**: Seed and ambient fixtures may remain hardcoded
+  mock payloads. The `deliver-crypto-good@` trigger performs real OpenPGP
+  encryption to the submitting user's sender-matching Autocrypt public key so
+  the resulting message can be decrypted by that user's private key. The demo
+  server never receives or stores private keys.
 * **Stateless Persistence**: Keep mailbox states, generated messages, and CardDAV changes in memory only. All state resets when the service restarts; no database or local persistence file is required.
 * **Controlled Reset Mode**: Provide an easy reset operation that restores all mailbox and CardDAV data to the original seeded state. Reset mode must be explicitly configurable, enabled for demonstrations when requested, and disabled by default for App Store testing. When disabled, reset endpoints and commands must be unavailable and must not be reachable through the public Cloudflared route.
 * **Build Secret**: Accept the Cloudflare Tunnel token as a deployment secret. Never hardcode it in source, seed data, Compose files, logs, or the image filesystem. Inject it at runtime using the Cloudflared container environment.
@@ -34,7 +38,9 @@ Implement this server using the following blueprint:
 * **Mailbox Structure**: Automatically expose standard folders upon login: `INBOX`, `Drafts`, `Sent Items`, `Trash`, `Archive`.
 * **Seed Content Matrices**:
   * **Standard Email**: Text-only, HTML formatting, multi-recipient headers.
-  * **Encrypted Email**: Raw text bodies containing mock `-----BEGIN PGP MESSAGE-----` blocks, PGP headers, and signatures to test the KyPost app client-side parsing.
+  * **Encrypted Email**: Seeded raw text bodies contain mock PGP blocks, headers,
+    and signatures for parser coverage; the encrypted delivery trigger produces
+    a real `-----BEGIN PGP MESSAGE-----` encrypted to the submitting user.
   * **Edge Cases**: Empty bodies, malformed MIME boundaries, deep nested thread headers (`In-Reply-To`, `References`).
 
 ### B. SMTP "Black Hole" Specifications

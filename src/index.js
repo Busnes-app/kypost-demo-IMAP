@@ -124,7 +124,8 @@ smtp.on('connection', (socket) => {
     secureContext,
     secure: false,
     allowLogin,
-    onAccepted: ({ persona, rcpts }) => deliverForRecipients(persona, rcpts, corpus, log),
+    onAccepted: ({ persona, from, rcpts, raw }) =>
+      deliverForRecipients(persona, rcpts, corpus, log, { from, raw }),
   });
 });
 

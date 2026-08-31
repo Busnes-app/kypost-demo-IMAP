@@ -11,5 +11,8 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "test/run.sh"
+  },
+  "dependencies": {
+    "openpgp": "^6.3.1"
   }
 }

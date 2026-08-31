@@ -3,6 +3,7 @@
 // sandbox persona's own INBOX.
 
 import { randomUUID } from 'node:crypto';
+import { createMessage, encrypt, readKey } from 'openpgp';
 import { addMessageDeduped } from './store.js';
 import { CATEGORIES } from './corpus.js';
 
@@ -36,11 +37,54 @@ export function injectEntry(persona, entry, now = new Date()) {
   return addMessageDeduped(persona, 'INBOX', freshen(entry.raw, now), [], now);
 }
 
+function headerValues(raw, name) {
+  const head = String(raw).split('\r\n\r\n', 1)[0].replace(/\r\n[ \t]+/g, ' ');
+  const prefix = `${name.toLowerCase()}:`;
+  return head.split('\r\n')
+    .filter((line) => line.toLowerCase().startsWith(prefix))
+    .map((line) => line.slice(prefix.length).trim());
+}
+
+async function autocryptKey(raw, from) {
+  for (const value of headerValues(raw, 'Autocrypt')) {
+    const fields = new Map(value.split(';').map((field) => {
+      const i = field.indexOf('=');
+      return [field.slice(0, i).trim().toLowerCase(), field.slice(i + 1).trim()];
+    }));
+    const addr = fields.get('addr')?.toLowerCase();
+    const keydata = fields.get('keydata')?.replace(/\s/g, '');
+    if (addr !== String(from).toLowerCase() || !keydata || keydata.length > 128 * 1024 ||
+        !/^[A-Za-z0-9+/]+={0,2}$/.test(keydata)) continue;
+    return readKey({ binaryKey: Buffer.from(keydata, 'base64') });
+  }
+  throw new Error('encrypted demo reply requires a valid sender-matching Autocrypt public key');
+}
+
+async function encryptedEntry(persona, submission) {
+  const publicKey = await autocryptKey(submission.raw, submission.from);
+  const ciphertext = await encrypt({
+    message: await createMessage({ text: 'This demo message was encrypted to your OpenPGP public key.' }),
+    encryptionKeys: publicKey,
+  });
+  return {
+    raw: `From: KyPost Demo <encrypted-reply@kypost-demo.local>\r
+To: ${persona.address}\r
+Subject: Encrypted demo reply\r
+Date: Thu, 01 Jan 1970 00:00:00 +0000\r
+Message-ID: <encrypted-placeholder@kypost-demo.local>\r
+MIME-Version: 1.0\r
+Content-Type: text/plain; charset=utf-8\r
+\r
+${ciphertext.replace(/\r?\n/g, '\r\n')}\r
+`,
+  };
+}
+
 // One delivery per distinct trigger address. Called from the SMTP session after
 // it has already filed and dropped the message. Repeats are collapsed first:
 // SMTP accepts 100 recipients, so a single submission naming the same trigger
 // each time would otherwise inject hundreds of messages.
-export function deliverForRecipients(persona, rcpts, corpus, log) {
+export async function deliverForRecipients(persona, rcpts, corpus, log, submission = {}) {
   if (!persona) return 0;
   let n = 0;
   const seen = new Set();
@@ -50,11 +94,21 @@ export function deliverForRecipients(persona, rcpts, corpus, log) {
     const local = String(rcpt).split('@')[0].trim().toLowerCase();
     if (seen.has(local)) continue;
     seen.add(local);
+    const before = n;
     for (const category of categories) {
-      injectEntry(persona, corpus.next(category));
+      if (category === 'crypto-good') {
+        try {
+          injectEntry(persona, await encryptedEntry(persona, submission));
+        } catch (e) {
+          log('encrypted corpus skipped', { persona: persona.key, trigger: rcpt, error: e.message });
+          continue;
+        }
+      } else {
+        injectEntry(persona, corpus.next(category));
+      }
       n++;
     }
-    log('corpus delivered', { persona: persona.key, trigger: rcpt, count: categories.length });
+    log('corpus delivered', { persona: persona.key, trigger: rcpt, count: n - before });
   }
   return n;
 }

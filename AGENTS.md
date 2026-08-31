@@ -48,6 +48,10 @@ Break one of these and the demo stops working with KyPost Server:
 - **Corpus delivery regenerates `Message-ID` and `Date`.** `addMessageDeduped`
   drops a second copy sharing an ID, so a fixture delivered twice with its
   stored ID would silently vanish.
+- **Encrypted trigger replies use only the sender-matching Autocrypt public
+  key.** The demo server never requests, receives, or stores a user's private
+  key; a missing or invalid key skips the encrypted reply instead of sending
+  plaintext.
 - **Drip delivery is capped at 15 messages per INBOX.** After each drip the
   oldest messages are evicted so the folder never exceeds this count. Without
   this the drip loop grows every persona's INBOX without bound and the
@@ -96,5 +100,4 @@ Non-trivial logic must include one runnable check (unit test or minimal self-che
 - DOX hierarchy scope is app-only.
 
 ## Child DOX Index
-
 

@@ -1,8 +1,6 @@
 # KyPost Demo Mail Server.
 #
-# Zero runtime npm dependencies: the whole server is Node's standard library
-# plus the openssl CLI for one-shot certificate generation at boot. Nothing to
-# audit in a lockfile, nothing to patch on a CVE Tuesday.
+# OpenPGP.js encrypts trigger replies to the submitting user's public key.
 FROM node:24-alpine
 
 # openssl: generates the sandbox certificate on first start. 443/587/993 need no
@@ -14,6 +12,8 @@ RUN addgroup -S -g 10001 kypost \
 
 WORKDIR /app
 COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --omit=dev
 COPY src ./src
 COPY corpus ./corpus
 

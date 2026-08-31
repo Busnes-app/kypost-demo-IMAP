@@ -56,7 +56,7 @@ matter and case is ignored, so `Deliver-Mail@anything` works.
 | Address | Delivers |
 |---|---|
 | `deliver-mail@` | An ordinary message |
-| `deliver-crypto-good@` | Valid signature or Autocrypt header |
+| `deliver-crypto-good@` | A real OpenPGP message encrypted to the sender's Autocrypt public key |
 | `deliver-crypto-bad@` | Broken signature, truncated armor, bad keydata |
 | `deliver-mime-bad@` | Unclosed boundary, bogus charset, broken base64 |
 | `deliver-batch@` | One of each |
@@ -67,6 +67,10 @@ Delivery failures (a bug in header rewriting, for instance) are logged
 server-side and never change the SMTP response, so a demo that silently isn't
 receiving injected mail needs a look at the server log, not the SMTP
 transcript.
+
+The encrypted trigger requires KyPost's outgoing `Autocrypt` header. The demo
+server validates that its `addr` matches the SMTP envelope sender and uses only
+the public key; it never receives or stores the user's private key.
 
 Mail also arrives on its own every 15–30 minutes for any account that has
 logged in, so a reviewer who touches nothing still sees a notification. Set

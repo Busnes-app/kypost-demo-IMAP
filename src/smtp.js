@@ -82,7 +82,8 @@ export function createSmtpSession(socket, { log, secureContext, secure, allowLog
     // Recipient-dependent behaviour lives in deliver.js, never here.
     if (onAccepted) {
       try {
-        onAccepted({ persona, from, rcpts: [...rcpts] });
+        Promise.resolve(onAccepted({ persona, from, rcpts: [...rcpts], raw }))
+          .catch((e) => log('onAccepted failed', e.message));
       } catch (e) {
         log('onAccepted failed', e.message);
       }

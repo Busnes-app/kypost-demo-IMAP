@@ -1,10 +1,10 @@
 blank_issues_enabled: true
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/Busness-app/kypost-demo-IMAP/security/advisories/new
+    url: https://github.com/Busnes-app/kypost-demo-IMAP/security/advisories/new
     about: Do not open a public issue. Report privately here — see SECURITY.md.
   - name: Something wrong in KyPost itself, seen on the demo
-    url: https://github.com/Busness-app/KyPost-Server/issues
+    url: https://github.com/Busnes-app/KyPost-Server/issues
     about: >-
       Most things you hit at demo.kypost.org are the SERVER, not this harness.
       Mail, labelling, pairing, PGP and the web UI all live in KyPost-Server.

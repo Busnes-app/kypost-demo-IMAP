@@ -67,7 +67,7 @@ services:
     # To test against a local checkout, comment the image line and use:
     #   build:
     #     context: ../kypost-server
-    image: ghcr.io/busness-app/kypost-server:${KYPOST_VERSION:-stable}
+    image: ghcr.io/busnes-app/kypost-server:${KYPOST_VERSION:-stable}
     container_name: kypost-server
     restart: unless-stopped
     depends_on:

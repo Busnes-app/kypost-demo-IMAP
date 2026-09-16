@@ -6,7 +6,7 @@ body:
     attributes:
       value: >-
         **Never report a security vulnerability here.** Use
-        [Security Advisories](https://github.com/Busness-app/kypost-demo-IMAP/security/advisories/new)
+        [Security Advisories](https://github.com/Busnes-app/kypost-demo-IMAP/security/advisories/new)
         — this harness holds a tunnel token and a reset token, and a public issue
         discloses a live weakness before a fix exists.
 

@@ -1,7 +1,7 @@
 # KyPost Demo Mail Server.
 #
 # OpenPGP.js encrypts trigger replies to the submitting user's public key.
-FROM node:24-alpine
+FROM node:25-alpine
 
 # openssl: generates the sandbox certificate on first start. 443/587/993 need no
 # capability — Docker sets ip_unprivileged_port_start=0 inside the container.

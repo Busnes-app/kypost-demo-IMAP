@@ -13,6 +13,6 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "openpgp": "^6.3.1"
+    "openpgp": "^6.3.2"
   }
 }

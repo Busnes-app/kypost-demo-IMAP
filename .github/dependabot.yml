@@ -1,0 +1,56 @@
+version: 2
+
+# Three days of cooldown on every ecosystem: a version that has been out for
+# three days has had three days for someone else to find the yanked release.
+# Cooldown applies to version updates only — a security update still arrives
+# the day it is published.
+updates:
+  - package-ecosystem: gomod
+    directory: /test/acceptance
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      ky-primitives:
+        patterns: ["github.com/Busnes-app/ky-primitives*"]
+      go:
+        patterns: ["*"]
+        exclude-patterns: ["github.com/Busnes-app/ky-primitives*"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      npm-build:
+        dependency-type: development
+      npm-runtime:
+        dependency-type: production
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: "chore(deps)"

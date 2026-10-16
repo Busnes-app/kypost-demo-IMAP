@@ -82,6 +82,7 @@ services:
       KYPOST_BIND: 127.0.0.1
       # Only cloudflared's forwarded headers are believed.
       TRUSTED_PROXY_CIDRS: "${CLOUDFLARED_IP:-172.30.0.30}/32"
+      TRUSTED_PROXY_HEADER: cf-connecting-ip
       SERVER_BASE_URL: "${PUBLIC_URL:-https://demo.kypost.org}"
       # Trust the sandbox mail server's certificate without touching the system
       # bundle: Go reads every file in each colon-separated SSL_CERT_DIR entry.
